@@ -1,4 +1,4 @@
-import * as jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import envHandler from '../helpers/envHandler.js';
 import catchAsync from '../helpers/catchAsync.js';

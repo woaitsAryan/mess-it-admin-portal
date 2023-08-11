@@ -1,11 +1,12 @@
 import User from '../models/userModel.js';
 import validator from 'validator';
 import { compareSync, genSaltSync, hashSync } from "bcrypt-ts";
-import * as jwt from 'jsonwebtoken';
-import envHandler from '../helpers/envHandler.js';
+import jwt from 'jsonwebtoken';
+// import envHandler from '../helpers/envHandler.js';
 import catchAsync from '../helpers/catchAsync.js';
 import mongoose from 'mongoose';
 import { Response, Request} from 'express';
+import {JWTSecret} from '../constants.js';
 
 export const Registercontroller = catchAsync(
     async(req: Request, res: Response) => {
@@ -29,7 +30,7 @@ export const Registercontroller = catchAsync(
         const hashedpassword = hashSync(password, salt);
         const newUser = new User({ _id: new mongoose.Types.ObjectId(), username, passwordHash: hashedpassword });
         await newUser.save();
-        const token = jwt.sign({ userID: newUser._id }, envHandler('JWTSecret'), { expiresIn: '30d' });
+        const token = jwt.sign({ userID: newUser._id }, JWTSecret, { expiresIn: '30d' });
         const returnpayload = {token: token, error: ""}
         return res.json(returnpayload);
 
@@ -50,7 +51,7 @@ export const Logincontroller = catchAsync(
         if(!result){
             return res.status(400).json({ error: 'Invalid username or password' });
         }
-        const token = jwt.sign({ userID: user._id }, envHandler('JWTSecret'), { expiresIn: '30d' });
+        const token = jwt.sign({ userID: user._id }, JWTSecret, { expiresIn: '30d' });
         return res.json({ token });
 
     }

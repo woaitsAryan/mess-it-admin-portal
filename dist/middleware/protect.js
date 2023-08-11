@@ -1,4 +1,4 @@
-import * as jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import envHandler from '../helpers/envHandler.js';
 import catchAsync from '../helpers/catchAsync.js';
 import User from '../models/userModel.js';
