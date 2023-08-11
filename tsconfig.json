@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "module": "ESNext",
         "moduleResolution": "node",
@@ -12,5 +13,9 @@
         ],
         "isolatedModules": false
     },
+    "ts-node": {
+        "esm":true
+    },
+    "lib":["ESNext"],
     "include": ["src/**/*", "src/types/request.d.ts"]
 }

@@ -2,6 +2,7 @@ import User from '../models/userModel.js';
 import validator from 'validator';
 import { compareSync, genSaltSync, hashSync } from "bcrypt-ts";
 import jwt from 'jsonwebtoken';
+// import envHandler from '../helpers/envHandler.js';
 import catchAsync from '../helpers/catchAsync.js';
 import mongoose from 'mongoose';
 import { JWTSecret } from '../constants.js';
