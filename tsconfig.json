@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "target": "ES2020",
+        "sourceMap": true,
+        "outDir": "dist",
+        "typeRoots": [
+            "./node_module/@types",
+            "./src/types"
+        ],
+        "isolatedModules": false
+    },
+    "include": ["src/**/*", "src/types/request.d.ts"]
+}
