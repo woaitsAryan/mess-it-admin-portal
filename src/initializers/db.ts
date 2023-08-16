@@ -1,12 +1,10 @@
-import mongoose from 'mongoose';
-import {DB_URL} from '../constants.js';
-
-const URL: string = DB_URL;
+import { configDotenv } from "dotenv";
+import mongoose from "mongoose";
+configDotenv();
 
 const connectToDB = async (): Promise<void> => {
-    
-    await mongoose.connect(URL);
-    return console.log('Connected to Database!');
+  await mongoose.connect(process.env.DB_URL);
+  return console.log("Connected to Database!");
 };
 
 export default connectToDB;
