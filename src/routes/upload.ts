@@ -58,6 +58,25 @@ function changeDateFormat(str) {
   return "";
 }
 
+async function updateMenu(
+  hostel: number,
+  month: number,
+  year: number,
+  menus: {
+    nonVegMenu: Result;
+    vegMenu: Result;
+    specialMenu: Result;
+  }
+) {
+  const criteria = { hostel, month, year };
+  const update = { hostel, month, year, menus };
+  const options = { upsert: true, new: true, overwrite: true };
+
+  const result = await Menu.findOneAndUpdate(criteria, update, options);
+
+  return result;
+}
+
 function performConversion(nonVegData, hostel, mess) {
   let groupedNonVegMenu: GroupedMenu = new Map();
 
@@ -143,7 +162,7 @@ uploadRouter.post("/", upload.single("file"), async (req, res) => {
       });
 
       // Get hostel from request body
-      const hostel = req.body.hostel;
+      const hostel = parseInt(req.body.hostel);
 
       const nonVegWorksheet = workbook.Sheets[nonVegSheetName],
         vegWorksheet = workbook.Sheets[vegSheetName],
@@ -157,24 +176,16 @@ uploadRouter.post("/", upload.single("file"), async (req, res) => {
       const vegResult = performConversion(vegData, hostel, 2);
       const specialResult = performConversion(specialData, hostel, 3);
 
-      const month = nonVegResult.menu[0].date.split("-")[1];
-      const year = nonVegResult.menu[0].date.split("-")[0];
-
-      // Save to db
-      const menu = new Menu({
-        hostel: 2,
-        month: month,
-        year: year,
-        menus: {
-          nonVegMenu: nonVegResult,
-          vegMenu: vegResult,
-          specialMenu: specialResult,
-        },
-      });
+      const month = parseInt(nonVegResult.menu[0].date.split("-")[1]);
+      const year = parseInt(nonVegResult.menu[0].date.split("-")[0]);
 
       let savedMenu;
       try {
-        savedMenu = await menu.save();
+        savedMenu = await updateMenu(hostel, month, year, {
+          nonVegMenu: nonVegResult,
+          vegMenu: vegResult,
+          specialMenu: specialResult,
+        });
       } catch (err) {
         return res.status(500).json({ message: "Failed to save menu", err });
       }
