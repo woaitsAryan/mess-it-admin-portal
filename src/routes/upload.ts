@@ -35,12 +35,12 @@ function isDayOfWeek(str) {
 }
 
 function isDate(str) {
-  const dateRegex = /^\d{2}\.\d{2}\.\d{4}$/;
+  const dateRegex = /^\d{1,2}\.\d{1,2}\.\d{4}$/;
   return dateRegex.test(str);
 }
 
 function getDayOfMonth(str) {
-  const dateRegex = /^\d{2}\.\d{2}\.\d{4}$/;
+  const dateRegex = /^\d{1,2}\.\d{1,2}\.\d{4}$/;
   if (dateRegex.test(str)) {
     const date = str.split(".");
     return parseInt(date[0]);
@@ -50,7 +50,7 @@ function getDayOfMonth(str) {
 
 function changeDateFormat(str) {
   // Convert dd.mm.yyyy to yyyy-mm-dd
-  const dateRegex = /^\d{2}\.\d{2}\.\d{4}$/;
+  const dateRegex = /^\d{1,2}\.\d{1,2}\.\d{4}$/;
   if (dateRegex.test(str)) {
     const date = str.split(".");
     return `${date[2]}-${date[1]}-${date[0]}`;
@@ -103,7 +103,9 @@ function performConversion(nonVegData, hostel, mess) {
       let j = i + 1;
       while (
         j < nonVegData.length &&
-        (isDate(nonVegData[j][key]) || nonVegData[j][key] == undefined)
+        (isDate(nonVegData[j][key]) ||
+          nonVegData[j][key] == undefined ||
+          nonVegData[j][key].trim() == "")
       ) {
         if (nonVegData[j][key]) {
           dates.push(nonVegData[j][key]);
@@ -172,9 +174,9 @@ uploadRouter.post("/", upload.single("file"), async (req, res) => {
       const vegData = XLSX.utils.sheet_to_json(vegWorksheet);
       const specialData = XLSX.utils.sheet_to_json(specialWorksheet);
 
-      const nonVegResult = performConversion(nonVegData, hostel, 1);
+      const specialResult = performConversion(specialData, hostel, 1);
       const vegResult = performConversion(vegData, hostel, 2);
-      const specialResult = performConversion(specialData, hostel, 3);
+      const nonVegResult = performConversion(nonVegData, hostel, 3);
 
       const month = parseInt(nonVegResult.menu[0].date.split("-")[1]);
       const year = parseInt(nonVegResult.menu[0].date.split("-")[0]);
@@ -182,15 +184,16 @@ uploadRouter.post("/", upload.single("file"), async (req, res) => {
       let savedMenu;
       try {
         savedMenu = await updateMenu(hostel, month, year, {
-          nonVegMenu: nonVegResult,
-          vegMenu: vegResult,
           specialMenu: specialResult,
+          vegMenu: vegResult,
+          nonVegMenu: nonVegResult,
         });
       } catch (err) {
         return res.status(500).json({ message: "Failed to save menu", err });
       }
 
-      return res.status(200).json(savedMenu);
+      // return res.status(200).json(savedMenu);
+      return res.status(200).json({ specialResult, vegResult, nonVegResult });
     }
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error", error });
